@@ -35,20 +35,7 @@ exports.resizeUserPhoto = async (req, res, next) => {
 
   next();
 };
-//////////// calculate total rating
-const calculateTotalRatingForUser = async (userId) => {
-  try {
-    const Ngom = db.models.NGOM;
-    const numberOfRatings = await Ngom.count({
-      where: { receiverId: userId },
-    });
 
-    return numberOfRatings;
-  } catch (error) {
-    console.error("Error calculating total rating for user:", error);
-    throw error;
-  }
-};
 /////////////// calculate average rating
 const calculateAverageRatingForUser = async (userId) => {
   try {
@@ -70,8 +57,8 @@ const calculateAverageRatingForUser = async (userId) => {
       0
     );
     const averageRating = sumOfRatings / ratings.length;
-
-    return averageRating;
+    const numberOfRatings = ratings.length;
+    return { averageRating, numberOfRatings };
   } catch (error) {
     console.error("Error calculating average rating for user:", error);
     throw error;
@@ -89,13 +76,12 @@ exports.getUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Assuming calculateTotalRatingForUser is an asynchronous function
-    const numberOfNgom = await calculateTotalRatingForUser(user.userId);
-    const averageRating = await calculateAverageRatingForUser(user.userId);
+    const { averageRating, numberOfRatings } =
+      await calculateAverageRatingForUser(user.userId);
 
     // Log the calculated total rating
 
-    res.status(200).json((data = { user, numberOfNgom, averageRating }));
+    res.status(200).json((data = { user, numberOfRatings, averageRating }));
   } catch (error) {
     // Handle errors properly
     console.error(error);
