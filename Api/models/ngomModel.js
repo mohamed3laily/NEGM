@@ -27,14 +27,6 @@ module.exports = (sequelize, DataTypes) => {
       ratingContent: {
         type: DataTypes.STRING,
       },
-      senderId: {
-        type: DataTypes.UUID,
-        // allowNull: false,
-      },
-      receiverId: {
-        type: DataTypes.UUID,
-        allowNull: false,
-      },
     },
     {
       // Other model options go here

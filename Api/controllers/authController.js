@@ -53,7 +53,7 @@ exports.login = async (req, res, next) => {
       return next(new Error("Please provide email and password"));
     }
 
-    let user = await User.findOne({ email });
+    let user = await User.findOne({ where: { email: email } });
 
     if (!user || !(await user.comparePassword(password, user.password))) {
       return next(new Error("Incorrect email or password"));

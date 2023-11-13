@@ -2,7 +2,8 @@ const factory = require("./factory");
 const multer = require("multer");
 const db = require("../models");
 const sharp = require("sharp");
-User = db.models.USER;
+const User = db.models.USER;
+const { Sequelize, literal, fn, col } = require("sequelize");
 
 const multerStorage = multer.memoryStorage();
 
@@ -34,10 +35,74 @@ exports.resizeUserPhoto = async (req, res, next) => {
 
   next();
 };
+//////////// calculate total rating
+const calculateTotalRatingForUser = async (userId) => {
+  try {
+    const Ngom = db.models.NGOM;
+    const numberOfRatings = await Ngom.count({
+      where: { receiverId: userId },
+    });
+
+    return numberOfRatings;
+  } catch (error) {
+    console.error("Error calculating total rating for user:", error);
+    throw error;
+  }
+};
+/////////////// calculate average rating
+const calculateAverageRatingForUser = async (userId) => {
+  try {
+    const Ngom = db.models.NGOM;
+
+    // Fetch all ratings for the user
+    const ratings = await Ngom.findAll({
+      attributes: ["rating"], // Assuming 'rating' is the name of the field in the NGOM model
+      where: { receiverId: userId },
+    });
+
+    if (!ratings || ratings.length === 0) {
+      return 0; // Return 0 if there are no ratings
+    }
+
+    // Calculate the average rating
+    const sumOfRatings = ratings.reduce(
+      (sum, rating) => sum + rating.rating,
+      0
+    );
+    const averageRating = sumOfRatings / ratings.length;
+
+    return averageRating;
+  } catch (error) {
+    console.error("Error calculating average rating for user:", error);
+    throw error;
+  }
+};
 
 exports.getAllUsers = factory.getAll(User);
-exports.getUser = factory.getOne(User);
-exports.createUser = factory.createOne(User);
+
+exports.getUser = async (req, res) => {
+  try {
+    // Use await for asynchronous operations
+    let user = await User.findByPk(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Assuming calculateTotalRatingForUser is an asynchronous function
+    const numberOfNgom = await calculateTotalRatingForUser(user.userId);
+    const averageRating = await calculateAverageRatingForUser(user.userId);
+
+    // Log the calculated total rating
+
+    res.status(200).json((data = { user, numberOfNgom, averageRating }));
+  } catch (error) {
+    // Handle errors properly
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 exports.deleteUser = factory.deleteOne(User);
 
 const filterObj = (obj, ...allowedFields) => {
@@ -46,6 +111,11 @@ const filterObj = (obj, ...allowedFields) => {
     if (allowedFields.includes(el)) newObj[el] = obj[el];
   });
   return newObj;
+};
+
+exports.getMe = async (req, res, next) => {
+  req.params.id = req.user.userId;
+  next();
 };
 
 exports.updateMe = async (req, res, next) => {

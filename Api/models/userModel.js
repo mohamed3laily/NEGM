@@ -68,10 +68,6 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       },
-      numberOfRatings: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-      },
     },
     {
       // Other model options go here
@@ -103,11 +99,6 @@ module.exports = (sequelize, DataTypes) => {
     } catch (error) {
       throw new Error(error);
     }
-  };
-
-  USER.prototype.incrementReceivedMessagesCount = async function () {
-    this.numberOfRatings += 1;
-    await this.save();
   };
 
   return USER;
