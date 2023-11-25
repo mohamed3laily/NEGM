@@ -7,6 +7,7 @@ const db = require("./models");
 
 const userRoutes = require("./routes/userRoutes");
 const ngomRoutes = require("./routes/ngomRoutes");
+const leagueRoutes = require("./routes/leagueRoutes");
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -17,6 +18,7 @@ app.use(bodyParser.json());
 
 app.use("/users", userRoutes);
 app.use("/ngom", ngomRoutes);
+app.use("/leagues", leagueRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

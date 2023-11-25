@@ -50,14 +50,14 @@ const calculateAverageRatingForUser = async (userId) => {
     if (!ratings || ratings.length === 0) {
       return 0; // Return 0 if there are no ratings
     }
+    const numberOfRatings = ratings.length;
 
     // Calculate the average rating
     const sumOfRatings = ratings.reduce(
       (sum, rating) => sum + rating.rating,
       0
     );
-    const averageRating = sumOfRatings / ratings.length;
-    const numberOfRatings = ratings.length;
+    const averageRating = sumOfRatings / numberOfRatings;
     return { averageRating, numberOfRatings };
   } catch (error) {
     console.error("Error calculating average rating for user:", error);

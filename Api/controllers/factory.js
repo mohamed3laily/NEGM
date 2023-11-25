@@ -75,6 +75,9 @@ exports.getAll = (Model) => async (req, res) => {
         items,
       },
     });
+    //////////////
+
+    ////////////////
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

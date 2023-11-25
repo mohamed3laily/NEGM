@@ -24,4 +24,5 @@ db.sequelize = sequelize;
 db.models = {};
 db.models.USER = require("./userModel")(sequelize, Sequelize.DataTypes);
 db.models.NGOM = require("./ngomModel")(sequelize, Sequelize.DataTypes);
+db.models.LEAGUE = require("./leaguesModel")(sequelize, Sequelize.DataTypes);
 module.exports = db;
